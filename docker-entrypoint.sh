@@ -13,8 +13,8 @@ gitpull() {
 
 if [ -n "$GIT_REMOTE" ]; then
     if [ -z "$GIT_BRANCH" ]; then
-        echo "[Git] GIT_BRANCH 未设置，使用默认值 master"
-        GIT_BRANCH="master"
+        echo "[Git] GIT_BRANCH 未设置，使用默认值 main"
+        GIT_BRANCH="main"
     fi
 
     if [ ! -d ".git" ]; then
