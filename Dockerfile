@@ -17,7 +17,7 @@ RUN chmod +x /app/docker-entrypoint.sh
 
 # 拷贝项目文件（你也可以改为 COPY . .）
 # COPY requirements.txt .        # 可选
-# COPY supervisord.conf .        # 可选
+COPY supervisord.conf /app/supervisord.conf
 
 # 设置脚本为默认入口（推荐用 ENTRYPOINT）
 
