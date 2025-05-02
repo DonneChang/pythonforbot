@@ -21,7 +21,4 @@ COPY supervisord.conf /app/supervisord.conf
 
 # 设置脚本为默认入口（推荐用 ENTRYPOINT）
 
-ENV GIT_BRANCH=main
-ENV SKIP_GIT=true
-
 ENTRYPOINT ["/app/docker-entrypoint.sh"]
