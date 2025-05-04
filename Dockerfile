@@ -2,6 +2,9 @@
 ARG PYTHON_VERSION=latest
 FROM python:${PYTHON_VERSION}
 
+# 设置环境变量（防止 tzdata 交互式提示）
+ENV DEBIAN_FRONTEND=noninteractive
+
 # 安装系统依赖：git、supervisor
 RUN apt-get update && apt-get install -y \
     git \
@@ -9,8 +12,12 @@ RUN apt-get update && apt-get install -y \
     wkhtmltopdf \
     xfonts-75dpi \
     xfonts-base \
-    && apt-get clean \
-    && rm -rf /var/lib/apt/lists/*
+    fonts-noto-cjk \
+    fonts-wqy-zenhei \
+    fonts-noto-color-emoji \ 
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
+    
+
 
 # 设置工作目录
 WORKDIR /app
