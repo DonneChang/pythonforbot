@@ -6,6 +6,10 @@ FROM python:${PYTHON_VERSION}
 RUN apt-get update && apt-get install -y \
     git \
     supervisor \
+    wkhtmltopdf \
+    xfonts-75dpi \
+    xfonts-base \
+    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
 # 设置工作目录
