@@ -39,13 +39,21 @@ fi
 echo "[Pip] 正在更新 pip..."
 pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade pip
 
-echo "[Pip] 正在安装 supervisor..."
-pip install supervisor -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
+# 判断是否安装 supervisor
+if [ "$INSTALL_SUPERVISOR" != "false" ]; then
+    echo "[Pip] 正在安装 supervisor..."
+    pip install supervisor -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
+else
+    echo "[Pip] 跳过 supervisor 安装（因为 INSTALL_SUPERVISOR=$INSTALL_SUPERVISOR）"
+fi
 
 if [ -f "requirements.txt" ]; then
     echo "[Pip] 检测到 requirements.txt，开始安装依赖..."
     pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
 fi
-
-echo "[Supervisor] 启动 supervisord 服务..."
-supervisord -c supervisord.conf -n
+if [ "$INSTALL_SUPERVISOR" != "false" ]; then
+    echo "[Supervisor] 启动 supervisord 服务..."
+    supervisord -c supervisord.conf -n
+else
+    echo "supervisor 未安装不启动"
+fi
