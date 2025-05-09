@@ -51,6 +51,7 @@ if [ -f "requirements.txt" ]; then
     echo "[Pip] 检测到 requirements.txt，开始安装依赖..."
     pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
 fi
+
 if [ "$INSTALL_SUPERVISOR" != "false" ]; then
     echo "[Supervisor] 启动 supervisord 服务..."
     supervisord -c supervisord.conf -n
