@@ -1,4 +1,4 @@
-name: Build and Push Docker Image
+name: Build and Push Multi-Platform Docker Image
 
 on:
   push:
@@ -9,6 +9,10 @@ on:
         description: "Python version to use (e.g. 3.11, 3.12, 3.13); leave empty to use python:latest"
         required: false
         default: ""
+      platforms:
+        description: "Comma-separated list of platforms (e.g. linux/amd64, linux/arm64); leave empty to build for linux/amd64,linux/arm64"
+        required: false
+        default: "linux/amd64,linux/arm64"
 
 jobs:
   build:
@@ -40,12 +44,24 @@ jobs:
             echo "TAG_NAME=${{ github.event.inputs.python_version }}" >> $GITHUB_OUTPUT
           fi
 
-      - name: Build Docker image
+      - name: Set platforms
+        id: platform
         run: |
-          docker build \
-            --build-arg PYTHON_VERSION=${{ steps.vars.outputs.PYTHON_VERSION }} \
-            -t ${{ secrets.DOCKER_USERNAME }}/python-for-bot:${{ steps.vars.outputs.TAG_NAME }} .
+          if [ -z "${{ github.event.inputs.platforms }}" ]; then
+            echo "Using default platforms: linux/amd64,linux/arm64"
+            echo "PLATFORMS=linux/amd64,linux/arm64" >> $GITHUB_OUTPUT
+          else
+            echo "Using specified platforms: ${{ github.event.inputs.platforms }}"
+            echo "PLATFORMS=${{ github.event.inputs.platforms }}" >> $GITHUB_OUTPUT
 
-      - name: Push Docker image
+      - name: Build and push Docker image for each platform
         run: |
-          docker push ${{ secrets.DOCKER_USERNAME }}/python-for-bot:${{ steps.vars.outputs.TAG_NAME }}
+          IFS=', ' read -r -a PLATFORMS <<< "${{ steps.platform.outputs.PLATFORMS }}"
+          for PLATFORM in "${PLATFORMS[@]}"; do
+            echo "Building image for platform $PLATFORM"
+            docker buildx build \
+              --platform $PLATFORM \
+              --build-arg PYTHON_VERSION=${{ steps.vars.outputs.PYTHON_VERSION }} \
+              -t ${{ secrets.DOCKER_USERNAME }}/python-for-bot:${{ steps.vars.outputs.TAG_NAME }}-$PLATFORM \
+              --push .
+          done
