@@ -8,7 +8,7 @@ echo "=========================="
 echo "[Debug] 当前目录: $(pwd)"
 echo "[Debug] GIT_REMOTE=$GIT_REMOTE"
 echo "[Debug] GIT_BRANCH=$GIT_BRANCH"
-echo "[Debug] SKIP_GIT=$SKIP_GIT"
+echo "[Debug] SKIP_GIT=$SKIP_GIT" 
 
 gitpull() {
     echo "[Git] 拉取远程分支..."
