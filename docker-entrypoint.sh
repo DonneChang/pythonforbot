@@ -55,6 +55,7 @@ fi
 if [ "$INSTALL_SUPERVISOR" != "false" ]; then
     echo "[Supervisor] 启动 supervisord 服务..."
     supervisord -c supervisord.conf -n
-else
+else    
     echo "supervisor 未安装不启动"
+    python main.py
 fi
