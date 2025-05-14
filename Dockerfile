@@ -8,6 +8,7 @@ ENV DEBIAN_FRONTEND=noninteractive
 # 安装系统依赖：git、supervisor
 RUN apt-get update && apt-get install -y \
     git \
+    mysql-client \
     supervisor \
     wkhtmltopdf \
     xfonts-75dpi \
