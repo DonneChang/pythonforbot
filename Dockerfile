@@ -21,16 +21,16 @@ RUN apt-get update && apt-get install -y \
 
 
 # 设置工作目录
-WORKDIR /tgbot_pyrogram
+WORKDIR /app
 
 # 拷贝入口脚本并赋予执行权限
-COPY docker-entrypoint.sh /tgbot_pyrogram/docker-entrypoint.sh
-RUN chmod +x /tgbot_pyrogram/docker-entrypoint.sh
+COPY docker-entrypoint.sh /app/docker-entrypoint.sh
+RUN chmod +x /app/docker-entrypoint.sh
 
 # 拷贝项目文件（你也可以改为 COPY . .）
 # COPY requirements.txt .        # 可选
-COPY supervisord.conf /tgbot_pyrogram/supervisord.conf
+COPY supervisord.conf /app/supervisord.conf
 
 # 设置脚本为默认入口（推荐用 ENTRYPOINT）
 
-ENTRYPOINT ["/tgbot_pyrogram/docker-entrypoint.sh"]
+ENTRYPOINT ["/app/docker-entrypoint.sh"]
