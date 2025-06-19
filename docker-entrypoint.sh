@@ -70,6 +70,7 @@ fi
 # 启动程序
 if [ "$INSTALL_SUPERVISOR" != "false" ]; then
     echo "[Supervisor] 启动 supervisord 服务..."
+    mkdir -p logs
     supervisord -c supervisord.conf -n
 else
     echo "[Supervisor] supervisor 未启用，直接运行主程序"
