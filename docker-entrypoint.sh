@@ -1,6 +1,10 @@
 #!/bin/bash
 set -e # 遇到错误立即退出
 
+# 设置默认值（如果未设置环境变量）
+: "${GIT_BRANCH:=main}"
+: "${GIT_REMOTE:=https://github.com/DonneChang/tgbot-py.git}"
+
 echo "=========================="
 echo "当前 Python 版本: $(python --version 2>&1)"
 echo "=========================="
@@ -10,29 +14,29 @@ echo "[Debug] GIT_REMOTE=$GIT_REMOTE"
 echo "[Debug] GIT_BRANCH=$GIT_BRANCH"
 echo "[Debug] SKIP_GIT=$SKIP_GIT"
 
+# 拉取代码函数
 gitpull() {
     echo "[Git] 拉取远程分支..."
     git fetch origin
-    if ! git rev-parse --verify "$GIT_BRANCH" >/dev/null 2>&1; then
-        echo "[Git] 本地分支 $GIT_BRANCH 不存在，创建..."
-        git checkout -b "$GIT_BRANCH" origin/"$GIT_BRANCH"
+
+    # 判断远程分支是否存在
+    if git ls-remote --exit-code --heads origin "$GIT_BRANCH" >/dev/null 2>&1; then
+        if ! git show-ref --verify --quiet refs/heads/"$GIT_BRANCH"; then
+            echo "[Git] 创建本地分支 $GIT_BRANCH 对应 origin/$GIT_BRANCH"
+            git checkout -b "$GIT_BRANCH" origin/"$GIT_BRANCH"
+        else
+            git checkout "$GIT_BRANCH"
+            git reset --hard origin/"$GIT_BRANCH"
+        fi
+        git pull origin "$GIT_BRANCH"
     else
-        git checkout "$GIT_BRANCH"
+        echo "[Git] 错误：远程分支 origin/$GIT_BRANCH 不存在"
+        exit 1
     fi
-    git reset --hard origin/"$GIT_BRANCH"
-    git pull origin "$GIT_BRANCH"
 }
 
+# Git 初始化与拉取
 if [ "$SKIP_GIT" != "true" ]; then
-    if [ -z "$GIT_BRANCH" ]; then
-        echo "[Git] GIT_BRANCH 未设置，使用默认值 main"
-        GIT_BRANCH="main"
-    fi
-    if [ -z "$GIT_REMOTE" ]; then
-        echo "[Git] GIT_REMOTE 未设置，使用默认值"
-        GIT_REMOTE="https://github.com/DonneChang/tgbot-py.git"
-    fi
-
     if [ ! -d ".git" ]; then
         echo "[Git] 初始化本地仓库..."
         git config --global --add safe.directory /app
@@ -47,25 +51,29 @@ else
     echo "[Git] 未执行 Git 拉取操作（可能未设置 GIT_REMOTE 或设置了 SKIP_GIT=true）"
 fi
 
+# pip 更新
 echo "[Pip] 正在更新 pip..."
 pip install -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade pip
 
+# 安装 supervisor（除非显式设置 INSTALL_SUPERVISOR=false）
 if [ "$INSTALL_SUPERVISOR" != "false" ]; then
     echo "[Pip] 正在安装 supervisor..."
     pip install supervisor -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
 else
-    echo "[Pip] 跳过 supervisor 安装（因为 INSTALL_SUPERVISOR=$INSTALL_SUPERVISOR）"
+    echo "[Pip] 跳过 supervisor 安装（INSTALL_SUPERVISOR=$INSTALL_SUPERVISOR）"
 fi
 
+# 安装依赖
 if [ -f "requirements.txt" ]; then
     echo "[Pip] 检测到 requirements.txt，开始安装依赖..."
     pip install -r requirements.txt -i http://mirrors.aliyun.com/pypi/simple/ --trusted-host=mirrors.aliyun.com --upgrade
 fi
 
+# 启动程序
 if [ "$INSTALL_SUPERVISOR" != "false" ]; then
     echo "[Supervisor] 启动 supervisord 服务..."
     supervisord -c supervisord.conf -n
 else
-    echo "[Supervisor] supervisor 未安装或未启用，直接运行 Python 主程序"
+    echo "[Supervisor] supervisor 未启用，直接运行主程序"
     python main.py
 fi
