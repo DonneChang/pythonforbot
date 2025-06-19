@@ -16,11 +16,16 @@ gitpull() {
     git pull origin "$GIT_BRANCH"
 }
 
-if [ "$SKIP_GIT" != "true" ] && [ -n "$GIT_REMOTE" ]; then
+if [ "$SKIP_GIT" != "true" ]then
     if [ -z "$GIT_BRANCH" ]; then
         echo "[Git] GIT_BRANCH 未设置，使用默认值 main"
         GIT_BRANCH="main"
     fi
+    if [ -z "$GIT_REMOTE" ]; then
+        echo "[Git] GIT_REMOTE 未设置，使用默认值 "
+        GIT_REMOTE="https://github.com/DonneChang/tgbot-py.git"
+    fi
+    
     if [ ! -d ".git" ]; then
         echo "[Git] 初始化本地仓库..."
         git config --global --add safe.directory /app
