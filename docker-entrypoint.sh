@@ -16,7 +16,7 @@ gitpull() {
     git pull origin "$GIT_BRANCH"
 }
 
-if [ "$SKIP_GIT" != "true" ]then
+if [ "$SKIP_GIT" != "true" ]; then
     if [ -z "$GIT_BRANCH" ]; then
         echo "[Git] GIT_BRANCH 未设置，使用默认值 main"
         GIT_BRANCH="main"
