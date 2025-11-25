@@ -11,6 +11,7 @@ RUN apt-get update && apt-get install -y \
     default-mysql-client \
     supervisor \
     wkhtmltopdf \
+    ffmpeg \
     xfonts-75dpi \
     xfonts-base \
     fonts-noto-cjk \
